@@ -154,6 +154,9 @@ namespace DNWS
         /// </summary>
         public void Process()
         {
+            /*Check Thread*/
+            Console.WriteLine("Thread ID: " + Thread.CurrentThread.ManagedThreadId);
+            Thread.Sleep(1000);   // Delay
             NetworkStream ns = new NetworkStream(_client);
             string requestStr = "";
             HTTPRequest request = null;
@@ -296,8 +299,15 @@ namespace DNWS
                     clientSocket = serverSocket.Accept();
                     // Get one, show some info
                     _parent.Log("Client accepted:" + clientSocket.RemoteEndPoint.ToString());
+                    // HTTPProcessor hp = new HTTPProcessor(clientSocket, _parent);
+                    // hp.Process();
+
+                    /*Thread*/
                     HTTPProcessor hp = new HTTPProcessor(clientSocket, _parent);
-                    hp.Process();
+                    TaskInfo ti = new TaskInfo(hp);
+
+                    Thread thread = new Thread(new ParameterizedThreadStart(ThreadProc));
+                    thread.Start(ti);
                 }
                 catch (Exception ex)
                 {
